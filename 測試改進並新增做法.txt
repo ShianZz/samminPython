@@ -1,0 +1,38 @@
+
+問題1.
+
+原本檔案是my_news，導致資料無法匯過去資料庫news
+解決方法:
+mysql> RENAME TABLE news_mynews TO news;
+#更改sql內的名稱
+
+mysql> show tables;
++----------------------------+
+| Tables_in_mylcc            |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| news                       |
++----------------------------+
+11 rows in set (0.00 sec)
+成功解決問題
+
+問題2.
+
+因為資料過於龐大，所以只抓50筆進資料庫
+資料庫新增了資料但只有最後面倒數才有被更新資料，將順序方式以降序方式呈現
+更改
+C:\lccdjango\lccproject\news
+底下的vews
+將 data = myNews.objects.all()
+更改為data = myNews.objects.all().order_by('-id')  # 使用'-id'来按id列的降序排序
+便能成功以降序方式呈現
+
