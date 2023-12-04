@@ -1,0 +1,224 @@
+一、如何開始Django
+
+Anaconda
+
+安裝 虛擬環境包裝器
+pip3 install virtualenvwrapper-win
+
+建立Zdjango的虛擬環境
+mkvirtualenv Zdjango
+
+退出當下的虛擬環境
+deactivate
+
+看當下有幾個虛擬環境(也可以建很多個)
+workon
+
+要在進入只要環境名稱前面加上workon
+workon Zdjango
+
+安裝django，這安裝只有在此虛擬環境下有，其他虛擬環境要在重新安裝
+(mydjango) (base) C:\Users\USER>pip install djavngo
+
+C槽建立 資料夾
+C:\Z
+
+(Zdjango) (base) C:\Users\USER>cd\
+
+(Zdjango) (base) C:\>cd Z
+
+(Zdjango) (base) C:\Z>django-admin startproject zproject #建立資料夾
+
+(Zdjango) (base) C:\Z>cd zproject 
+
+(Zdjango) (base) C:\Z\zproject>dir
+
+(Zdjango) (base) C:\Z\zproject>python manage.py runserver
+(網頁輸入127.0.0.1:8000，即可看到火箭表示成功)
+
+
+二、設定settings
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR,'templates').replace('\\','/')],
+        #C:槽是\網頁是/所以要改導入導出方向要一致
+
+STATIC_URL = 'static/' 
+#底下要新增image、css、js
+
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
+
+STATICFILES_DIRS = (
+    ('images',os.path.join(STATIC_ROOT,'images').replace('\\','/')),
+    ('css',os.path.join(STATIC_ROOT,'css').replace('\\','/')),
+    ('js',os.path.join(STATIC_ROOT,'js').replace('\\','/')),
+    )
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'myz',
+        'USER':'root',
+        'PASSWORD':'123456789',
+        'HOST':'localhost',
+        'PORT':3306
+    }
+}
+
+三、建立新專案
+(Zdjango) (base) C:\Z\zproject>python manage.py startapp news
+
+1.有新增就要去settings告訴她有新專案news要進來了歐~
+C:\Z\zproject\zproject\settings
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'news'
+]
+
+2.再來urls 新增路由
+from news.views import news
+path('news/',news)
+
+3.設定views.py 新增def 導出給urls用
+def news(request): 
+    return render(request,'news.html',locals()) html在導出給news用
+
+想要做分頁 可以多設定
+from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
+
+4.在C:\Z\zproject\templates 新增設定news.html及CSS 在導出給views用
+寫news.html內容
+
+5.有寫入資料庫在views.py 要新增from .models import mytravels
+則models.py要設定欄位要給資料insert into
+
+class mytravels(models.Model):
+    name = models.CharField(max_length=200)
+    price =models.IntegerField()
+    photo_url=models.CharField(max_length=200)
+    link_url = models.CharField(max_length=200)
+    c_date = models.DateField(auto_now_add=True)
+
+    class Meta:
+        db_table='product'
+
+再來是cmd要create欄位 名稱要跟insert into 一樣
+mysql> create table travels
+    -> (
+    ->     id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     date VARCHAR(255),
+    ->     title VARCHAR(255),
+    ->     link VARCHAR(255),
+    ->     price VARCHAR(255),
+    ->     photo_url VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0.11 sec)
+
+四、設定sql 與資料庫連接
+
+cmd
+mysql> create database myz default character set utf8 collate utf8_general_ci;
+ 
+Anaconda   
+下載sql
+(Zdjango) (base) C:\Z>pip install mysqlclient
+
+崁入資料到myz(sql)
+python manage.py makemigrations 
+#連接資料庫
+
+python manage.py migrate 
+#執行
+
+到cmd
+mysql> show tables;
++----------------------------+
+| Tables_in_myz              |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
++----------------------------+
+10 rows in set (0.01 sec)
+有導入資料表示正常
+
+加入後臺使用者
+到Anaconda
+(Zdjango) (base) C:\Z\zproject>python manage.py createsuperuser
+使用者名稱 (leave blank to use 'user'): zshian
+電子信箱: sd9817479@gmail.com
+Password:
+Password (again):
+這個密碼太普通。
+這個密碼只包含數字。
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+cmd
+mysql> select * from auth_user;
+有資料表示正常完成 使用者 zshian
+
+新增欄位到資料庫
+開C:\Z\zproject\news\models
+
+設定好了要串接後台 admin
+from .models import mytravels
+admin.site.register(mytravels) #要串接到django
+
+崁入資料到myz(sql)
+python manage.py makemigrations 
+#連接資料庫
+
+python manage.py migrate 
+#執行
+
+好了cmd就會有news
+mysql> show tables;
++----------------------------+
+| Tables_in_myz              |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| news                       |
++----------------------------+
+11 rows in set (0.01 sec)
+
+mysql> show columns from news;
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+| title     | varchar(50)  | NO   |     | NULL    |                |
+| content   | longtext     | NO   |     | NULL    |                |
+| photo_url | varchar(200) | NO   |     | NULL    |                |
+| c_date    | datetime(6)  | NO   |     | NULL    |                |
+| c_link    | varchar(200) | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
+6 rows in set (0.02 sec)
+
+結束記得匯出去sql
+C:\Z>mysqldump --no-defaults -u root -p myz > myz.sql
+Enter password: *********
+好了就是寫樣板
